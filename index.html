@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Weather Condition</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      background-image: url("https://wallpapers.com/images/hd/perfect-weather-with-gradient-sky-ym0nn79vhoqg34v3.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    .weather-card {
+      max-width: 100%;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .flex-container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .flex-container h4 {
+      margin: 10px 0;
+    }
+
+    @media (max-width: 768px) {
+      .weather-card {
+        padding: 15px;
+      }
+
+      h1.card-title {
+        font-size: 1.8rem;
+      }
+
+      h4 {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      h3, h4 {
+        font-size: 0.9rem;
+      }
+
+      .flex-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-dark text-dark">
+  <div class="container text-dark">
+    <div class="weather-card card shadow bg-light mt-5" style="background-image: url('https://t3.ftcdn.net/jpg/05/79/86/10/360_F_579861052_KjeAAbyaXOBY6JjxMEPBVJypp2KSb59v.jpg');">
+      <div class="card-body text-dark">
+        <h1 class="card-title text-center text-success">FIND OUT WEATHER</h1>
+        <div class="mb-3">
+          <input type="text" id="cityInput" class="form-control" placeholder="Enter city">
+        </div>
+        <button id="getWeatherBtn" class="btn btn-success w-100">SEARCH</button>
+        <div id="weatherResult" class="mt-4" style="display: none;">
+          <h1 class="text-center text-primary" id="temperature"></h1>
+          <h3 class="text-center text-danger" id="cityName"></h3>
+          <h4 class="text-center text-warning">Weather: <span id="weatherDescription"></span></h4>
+          <div class="flex-container">
+            <h4 class="text-success">Wind: <span id="wind"></span> km/h</h4>
+            <h4 class="text-success">Clouds: <span id="clouds"></span>%</h4>
+          </div>
+        </div>
+        <div id="errorMessage" class="alert alert-danger mt-4" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('getWeatherBtn').addEventListener('click', () => {
+      const city = document.getElementById('cityInput').value.trim();
+
+      if (!city) {
+        displayError('City field should not be empty');
+        return;
+      }
+
+      fetchWeather(city);
+    });
+
+    async function fetchWeather(city) {
+      const apiKey = '3c6bb1ff885845fcbb361b86735ca4ba'; 
+      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+      try {
+        const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+          throw new Error('City not found');
+        }
+
+        const data = await response.json();
+
+        displayWeather(data);
+      } catch (error) {
+        displayError(error.message);
+      }
+    }
+
+    function displayWeather(data) {
+      document.getElementById('errorMessage').style.display = 'none';
+
+      document.getElementById('cityName').textContent = data.name;
+      document.getElementById('temperature').textContent = `${data.main.temp}°C`;
+      document.getElementById('weatherDescription').textContent = data.weather[0].description;
+      document.getElementById('wind').textContent = data.wind.speed;
+      document.getElementById('clouds').textContent = data.clouds.all;
+
+      document.getElementById('weatherResult').style.display = 'block';
+    }
+
+    function displayError(message) {
+      document.getElementById('weatherResult').style.display = 'none';
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorMessage').style.display = 'block';
+    }
+  </script>
+</body>
+
+</html>
